@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "vector-retrieval-service"
+version = "0.1.0"
+description = ""
+authors = ["Lokixin <dimasavilamartinez@gmail.com>"]
+packages = [{include = "vector_retrieval_service", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+uvicorn = "^0.27.1"
+numpy = "^1.26.4"
+torch = {version = "^2.2.1+cu121", source = "pytorch"}
+torchvision = {version = "^0.17.1+cu121", source = "pytorch"}
+sentence-transformers = "^2.4.0"
+asyncer = "^0.0.5"
+accelerate = "^0.27.2"
+pillow = "^10.2.0"
+python-multipart = "^0.0.9"
+types-pillow = "^10.2.0.20240213"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.2.2"
+mypy = "^1.8.0"
+huggingface-hub = "^0.21.3"
+
+
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

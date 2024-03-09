@@ -4,7 +4,7 @@ ALL_PACKAGES := src tests
 
 lint:
 	poetry run ruff check $(ALL_PACKAGES) &
-	poetry run mypy .
+	poetry run mypy $(ALL_PACKAGES)
 
 reformat:
 	poetry run ruff format $(ALL_PACKAGES)

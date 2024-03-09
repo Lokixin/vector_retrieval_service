@@ -49,7 +49,7 @@ async def get_text_similarity_service(
         original_query=query,
         text_similarities=[
             TextSimilarity(
-                distance_to_query=distance,
+                distance_to_query=float(distance),
                 text=text,
                 original_text_position=texts.index(text),
             )

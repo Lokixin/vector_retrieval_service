@@ -19,7 +19,7 @@ class TextSimilarityResponse(BaseModel):
 
 
 class TextToImageScore(BaseModel):
-    image_identifier: str
+    image_identifier: str | None = ""
     score: float
 
 

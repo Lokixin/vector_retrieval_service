@@ -4,10 +4,13 @@ from enum import StrEnum, auto
 from functools import lru_cache
 
 import numpy as np
+from numpy._typing import _32Bit
+from numpy.typing import NDArray
 import torch
+from numpy import floating, dtype, ndarray
 from sentence_transformers import SentenceTransformer  # type: ignore
 from sentence_transformers import util
-from transformers import CLIPModel, CLIPProcessor, PreTrainedModel # type: ignore
+from transformers import CLIPModel, CLIPProcessor, PreTrainedModel  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +35,8 @@ class SearchScoreFunctions(StrEnum):
 
 
 def compute_euclidean_distance(
-    query_embedding: np.ndarray, corpus_embedding: np.ndarray
-) -> float:
+    query_embedding: NDArray[np.float32], corpus_embedding: NDArray[np.float32]
+) -> floating:
     euclidean_distance = np.linalg.norm(corpus_embedding - query_embedding)
     return euclidean_distance
 
@@ -63,7 +66,11 @@ class LLMFactory:
     def get_score_function(
         score_function: SearchScoreFunctions | str,
     ) -> typing.Callable[
-        [torch.Tensor | np.ndarray, torch.Tensor | np.ndarray], torch.Tensor | float
+        [
+            ndarray[typing.Any, dtype[floating[_32Bit]]],
+            ndarray[typing.Any, dtype[floating[_32Bit]]],
+        ],
+        floating[typing.Any],
     ]:
         match score_function:
             case SearchScoreFunctions.EUCLIDEAN:
@@ -82,6 +89,14 @@ class LLMFactory:
     ) -> tuple[PreTrainedModel, PreTrainedModel]:
         match model_type:
             case ImageModels.CLIP_MODEL:
+                clip_model = CLIPModel.from_pretrained(
+                    "openai/clip-vit-base-patch32"
+                ).to(DEVICE)
+                clip_processor = CLIPProcessor.from_pretrained(
+                    "openai/clip-vit-base-patch32"
+                )
+                return clip_processor, clip_model
+            case _:
                 clip_model = CLIPModel.from_pretrained(
                     "openai/clip-vit-base-patch32"
                 ).to(DEVICE)

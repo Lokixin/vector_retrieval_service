@@ -15,7 +15,7 @@ from vector_retrieval_service.service_api.services.dtos import (
 
 
 async def get_text_and_image_similitude_service(
-    image: Image, texts: list[str], requested_model: ImageModels
+    image: Image.Image, texts: list[str], requested_model: ImageModels
 ) -> dict[str, Any]:
     clip_processor, clip_model = LLMFactory.get_image_model(requested_model)
     input_to_model = await asyncer.asyncify(clip_processor)(
@@ -37,7 +37,10 @@ async def get_text_and_image_similitude_service(
 
 
 async def get_texts_and_image_similitude_service(
-    images: Image, texts: list[str], requested_model: ImageModels, image_ids: list[str]
+    images: list[Image.Image],
+    texts: list[str],
+    requested_model: ImageModels,
+    image_ids: list[str | None],
 ) -> list[TextToImagesSimilarity]:
     clip_processor, clip_model = LLMFactory.get_image_model(requested_model)
     input_to_model = await asyncer.asyncify(clip_processor)(

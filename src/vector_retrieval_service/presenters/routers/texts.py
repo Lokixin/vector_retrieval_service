@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Query, Body
 
-from vector_retrieval_service.embedding_retriever.ai_models.model_factory import (
+from vector_retrieval_service.domain.factories import (
     LanguageModels,
     SearchScoreFunctions,
 )
-from vector_retrieval_service.service_api.services.dtos import (
+from vector_retrieval_service.services.dtos import (
     TextEmbeddingsResponse,
     TextSimilarityResponse,
 )
-from vector_retrieval_service.service_api.services.text_services import (
+from vector_retrieval_service.services.text_services import (
     get_text_embedding_service,
     get_text_similarity_service,
 )

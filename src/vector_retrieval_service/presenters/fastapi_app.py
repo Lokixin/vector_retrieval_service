@@ -3,11 +3,11 @@ import logging
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 
-from vector_retrieval_service.service_api.views.iamge_views import image_router
-from vector_retrieval_service.service_api.views.multimodal_services import (
+from vector_retrieval_service.presenters.routers.iamges import image_router
+from vector_retrieval_service.presenters.routers.multimodals import (
     multimodal_router,
 )
-from vector_retrieval_service.service_api.views.text_views import retrieval_service
+from vector_retrieval_service.presenters.routers.texts import retrieval_service
 
 
 logging.basicConfig(level=logging.INFO)

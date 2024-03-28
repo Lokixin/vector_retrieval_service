@@ -3,12 +3,10 @@ from typing import Any
 import asyncer
 from PIL import Image
 
-from vector_retrieval_service.embedding_retriever.ai_models.model_factory import (
-    ImageModels,
-    LLMFactory,
-    DEVICE,
-)
-from vector_retrieval_service.service_api.services.dtos import (
+from vector_retrieval_service.config import DEVICE
+from vector_retrieval_service.domain.factories import ImageModels
+from vector_retrieval_service.domain import factories
+from vector_retrieval_service.services.dtos import (
     TextToImagesSimilarity,
     TextToImageScore,
 )
@@ -17,7 +15,7 @@ from vector_retrieval_service.service_api.services.dtos import (
 async def get_text_and_image_similitude_service(
     image: Image.Image, texts: list[str], requested_model: ImageModels
 ) -> dict[str, Any]:
-    clip_processor, clip_model = LLMFactory.get_image_model(requested_model)
+    clip_processor, clip_model = factories.make_image_model(requested_model)
     input_to_model = await asyncer.asyncify(clip_processor)(
         text=texts,
         images=image,
@@ -42,7 +40,7 @@ async def get_texts_and_image_similitude_service(
     requested_model: ImageModels,
     image_ids: list[str | None],
 ) -> list[TextToImagesSimilarity]:
-    clip_processor, clip_model = LLMFactory.get_image_model(requested_model)
+    clip_processor, clip_model = factories.make_image_model(requested_model)
     input_to_model = await asyncer.asyncify(clip_processor)(
         text=texts,
         images=images,

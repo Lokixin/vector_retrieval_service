@@ -5,10 +5,8 @@ from typing import Any
 from fastapi import APIRouter, UploadFile
 from PIL import Image
 
-from vector_retrieval_service.embedding_retriever.ai_models.model_factory import (
-    ImageModels,
-)
-from vector_retrieval_service.service_api.services.image_services import (
+from vector_retrieval_service.domain.factories import ImageModels
+from vector_retrieval_service.services.image_services import (
     get_image_embeddings_services,
 )
 

@@ -4,11 +4,9 @@ from typing import Any
 from PIL import Image
 from fastapi import APIRouter, UploadFile
 
-from vector_retrieval_service.embedding_retriever.ai_models.model_factory import (
-    ImageModels,
-)
-from vector_retrieval_service.service_api.services.dtos import TextToImagesSimilarity
-from vector_retrieval_service.service_api.services.multimodal_services import (
+from vector_retrieval_service.domain.factories import ImageModels
+from vector_retrieval_service.services.dtos import TextToImagesSimilarity
+from vector_retrieval_service.services.multimodal_services import (
     get_text_and_image_similitude_service,
     get_texts_and_image_similitude_service,
 )

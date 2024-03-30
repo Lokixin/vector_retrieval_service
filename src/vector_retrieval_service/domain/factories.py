@@ -5,8 +5,8 @@ from functools import lru_cache
 from numpy import ndarray, dtype, floating
 from numpy._typing import _32Bit
 
-from sentence_transformers import SentenceTransformer, util
-from transformers import PreTrainedModel, CLIPModel, CLIPProcessor
+from sentence_transformers import SentenceTransformer, util  # type: ignore
+from transformers import PreTrainedModel, CLIPModel, CLIPProcessor  # type: ignore
 
 from vector_retrieval_service.config import DEVICE
 from vector_retrieval_service.domain.scores import compute_euclidean_distance
@@ -19,7 +19,7 @@ class LanguageModels(StrEnum):
 
 class ImageModels(StrEnum):
     CLIP_MODEL = auto()
-    CLIP_PROCESSOR = auto()
+    FAKE = auto()
 
 
 class SearchScoreFunctions(StrEnum):

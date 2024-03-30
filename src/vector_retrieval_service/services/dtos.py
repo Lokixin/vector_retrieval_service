@@ -18,6 +18,15 @@ class TextSimilarityResponse(BaseModel):
     text_similarities: list[TextSimilarity]
 
 
+class TextsToImageSimilarity(BaseModel):
+    text: str
+    score: float
+
+
+class TextsToImageSimilarities(BaseModel):
+    similarities: list[TextsToImageSimilarity]
+
+
 class TextToImageScore(BaseModel):
     image_identifier: str | None = ""
     score: float
@@ -26,3 +35,8 @@ class TextToImageScore(BaseModel):
 class TextToImagesSimilarity(BaseModel):
     search_text: str
     scores: list[TextToImageScore]
+
+
+class ImageEmbeddingsResponse(BaseModel):
+    embeddings: list[float]
+    ai_model_used: str = "CLIP"

@@ -1,14 +1,22 @@
-from fastapi import APIRouter, Query, Body
+from fastapi import APIRouter, Query, Body, Depends
 
-from vector_retrieval_service.embedding_retriever.ai_models.model_factory import (
+from vector_retrieval_service.domain.ai_models import (
+    LanguageModelInterface,
+    ScoreComputer,
+)
+from vector_retrieval_service.domain.factories import (
     LanguageModels,
     SearchScoreFunctions,
 )
-from vector_retrieval_service.service_api.services.dtos import (
+from vector_retrieval_service.presenters.dependencies import (
+    get_language_model_interface,
+    get_score_computer,
+)
+from vector_retrieval_service.services.dtos import (
     TextEmbeddingsResponse,
     TextSimilarityResponse,
 )
-from vector_retrieval_service.service_api.services.text_services import (
+from vector_retrieval_service.services.text_services import (
     get_text_embedding_service,
     get_text_similarity_service,
 )
@@ -31,9 +39,15 @@ retrieval_service = APIRouter(
     "/get_embeddings", description="Get embeddings for a short plain text"
 )
 async def get_text_embeddings(
-    text: str, requested_model: LanguageModels
+    text: str,
+    requested_model: LanguageModels,
+    llm_interface: LanguageModelInterface = Depends(get_language_model_interface),
 ) -> TextEmbeddingsResponse:
-    return await get_text_embedding_service(text=text, requested_model=requested_model)
+    return await get_text_embedding_service(
+        text=text,
+        requested_model=requested_model,
+        llm_interface=llm_interface,
+    )
 
 
 @retrieval_service.post(
@@ -45,10 +59,13 @@ async def get_text_similarity(
     score_function: SearchScoreFunctions = SearchScoreFunctions.EUCLIDEAN,
     query: str = Query(default="Quiero aprender a programar"),
     texts: list[str] = Body(examples=[text_embeddings_example]),
+    llm_interface: LanguageModelInterface = Depends(get_language_model_interface),
+    score_computer: ScoreComputer = Depends(get_score_computer),
 ) -> TextSimilarityResponse:
     return await get_text_similarity_service(
         query=query,
         texts=texts,
-        requested_model=requested_model,
         score_function=score_function,
+        llm_interface=llm_interface,
+        score_computer=score_computer,
     )

@@ -103,3 +103,96 @@ def test_multimodal_multi_image_route_uses_shared_upload_validation(
     )
 
     assert response.status_code == 400
+
+
+def test_multimodal_route_accepts_repeated_text_form_fields(
+    client: TestClient,
+) -> None:
+    class FakeImageModelInterface:
+        async def compute_similarity(
+            self, texts: list[str], input_image: Image.Image | list[Image.Image]
+        ) -> torch.Tensor:
+            assert texts == ["cat", "dog"]
+            return torch.tensor([[0.1], [0.9]])
+
+    app.dependency_overrides[get_image_model_interface] = lambda: FakeImageModelInterface()
+
+    response = client.post(
+        "/multimodal/texts_and_image_scores",
+        params={"requested_model": "clip_model"},
+        data={"texts": ["cat", "dog"]},
+        files={"image": ("image.png", make_png(), "image/png")},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "similarities": [
+            {"text": "dog", "score": 0.8999999761581421},
+            {"text": "cat", "score": 0.10000000149011612},
+        ]
+    }
+
+
+def test_multimodal_route_preserves_commas_inside_text(
+    client: TestClient,
+) -> None:
+    class FakeImageModelInterface:
+        async def compute_similarity(
+            self, texts: list[str], input_image: Image.Image | list[Image.Image]
+        ) -> torch.Tensor:
+            assert texts == ["cat,dog"]
+            return torch.tensor([[0.5]])
+
+    app.dependency_overrides[get_image_model_interface] = lambda: FakeImageModelInterface()
+
+    response = client.post(
+        "/multimodal/texts_and_image_scores",
+        params={"requested_model": "clip_model"},
+        data={"texts": "cat,dog"},
+        files={"image": ("image.png", make_png(), "image/png")},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"similarities": [{"text": "cat,dog", "score": 0.5}]}
+
+
+def test_multimodal_multi_image_route_accepts_repeated_text_form_fields(
+    client: TestClient,
+) -> None:
+    class FakeImageModelInterface:
+        async def compute_similarity(
+            self, texts: list[str], input_image: Image.Image | list[Image.Image]
+        ) -> torch.Tensor:
+            assert texts == ["cat", "dog"]
+            assert isinstance(input_image, list)
+            return torch.tensor([[0.2, 0.8], [0.7, 0.3]])
+
+    app.dependency_overrides[get_image_model_interface] = lambda: FakeImageModelInterface()
+
+    response = client.post(
+        "/multimodal/texts_and_images_scores",
+        params={"requested_model": "clip_model"},
+        data={"texts": ["cat", "dog"]},
+        files=[
+            ("images", ("first.png", make_png(), "image/png")),
+            ("images", ("second.png", make_png(), "image/png")),
+        ],
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "search_text": "cat",
+            "scores": [
+                {"image_identifier": "second.png", "score": 0.800000011920929},
+                {"image_identifier": "first.png", "score": 0.20000000298023224},
+            ],
+        },
+        {
+            "search_text": "dog",
+            "scores": [
+                {"image_identifier": "first.png", "score": 0.699999988079071},
+                {"image_identifier": "second.png", "score": 0.30000001192092896},
+            ],
+        },
+    ]

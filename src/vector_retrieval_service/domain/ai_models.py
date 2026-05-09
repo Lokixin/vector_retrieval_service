@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Protocol
 
 import asyncer
 import torch
@@ -11,6 +11,28 @@ from vector_retrieval_service.domain.factories import (
     SearchScoreFunctions,
     ImageModels,
 )
+
+
+class LanguageModelProtocol(Protocol):
+    async def encode(
+        self,
+        model_input: list[str],
+        convert_to_tensor: bool = False,
+        convert_to_numpy: bool = True,
+        normalize_embeddings: bool = False,
+    ) -> Any: ...
+
+
+class ImageModelProtocol(Protocol):
+    async def encode(self, image: Image) -> torch.Tensor: ...
+
+    async def compute_similarity(
+        self, texts: list[str], input_image: Image | list[Image]
+    ) -> torch.Tensor: ...
+
+
+class ScoreComputerProtocol(Protocol):
+    def compute_score(self, corpus: Any, query: Any) -> Any: ...
 
 
 class LanguageModelInterface:

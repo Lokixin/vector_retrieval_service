@@ -17,6 +17,7 @@ FastAPI service for text embeddings, text similarity, image embeddings, and CLIP
 ## Verify
 - Run lint and type checks with `make lint`.
 - Run all tests with `poetry run pytest --disable-warnings`.
+- Run tests with coverage using `poetry run pytest --disable-warnings --cov=vector_retrieval_service --cov-report=term-missing`.
 - Run integration tests with `make integration`.
 - Focus one test with `poetry run pytest tests/integration/test_text_services.py::test_get_text_embedding_service --disable-warnings`.
 
@@ -24,7 +25,9 @@ FastAPI service for text embeddings, text similarity, image embeddings, and CLIP
 - Local Kafka/Zookeeper are defined in `docker-compose.yaml`.
 - Start them with `docker compose up -d`.
 - Producer and consumer scripts use topic `text_services` and default to `127.0.0.1:9093`.
-- Consumer settings can be overridden with `KAFKA_TOPIC`, `KAFKA_BOOTSTRAP_SERVERS`, and `KAFKA_GROUP_ID`.
+- Kafka settings can be overridden with `KAFKA_TOPIC`, `KAFKA_BOOTSTRAP_SERVERS`, and `KAFKA_GROUP_ID`.
+- Run the optional Docker Kafka round-trip test with `RUN_KAFKA_DOCKER_TESTS=1 poetry run pytest tests/integration/test_kafka_docker.py --disable-warnings` after starting Kafka.
+- Force model device selection with `VECTOR_RETRIEVAL_DEVICE`; otherwise the service chooses CUDA when available and CPU otherwise.
 
 ## API Notes
 - Multimodal upload routes expect repeated `texts` form fields, not comma-separated text splitting.

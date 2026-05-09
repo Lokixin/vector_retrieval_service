@@ -1,25 +1,22 @@
 import asyncio
 import json
 import logging
-import os
 from collections.abc import Iterable
 from typing import Any
 
 from kafka import KafkaConsumer  # type: ignore[import-untyped]
 
+from vector_retrieval_service.config import SETTINGS, AppSettings
 from vector_retrieval_service.consumers.event_processor import process_event
 
-TOPIC = os.getenv("KAFKA_TOPIC", "text_services")
-BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "127.0.0.1:9093").split(",")
-GROUP_ID = os.getenv("KAFKA_GROUP_ID", "vector_retrieval_service")
 logger = logging.getLogger(__name__)
 
 
-def make_consumer() -> KafkaConsumer:
+def make_consumer(settings: AppSettings = SETTINGS) -> KafkaConsumer:
     return KafkaConsumer(
-        TOPIC,
-        bootstrap_servers=BOOTSTRAP_SERVERS,
-        group_id=GROUP_ID,
+        settings.kafka_topic,
+        bootstrap_servers=settings.kafka_bootstrap_servers,
+        group_id=settings.kafka_group_id,
         value_deserializer=lambda m: json.loads(m.decode("utf-8")),
         auto_offset_reset="latest",
         enable_auto_commit=False,
@@ -30,7 +27,7 @@ async def handle_message(message: Any) -> Any:
     logger.info(
         "Processing Kafka message",
         extra={
-            "topic": getattr(message, "topic", TOPIC),
+            "topic": getattr(message, "topic", SETTINGS.kafka_topic),
             "partition": getattr(message, "partition", None),
             "offset": getattr(message, "offset", None),
         },
@@ -39,7 +36,7 @@ async def handle_message(message: Any) -> Any:
     logger.info(
         "Kafka message processed",
         extra={
-            "topic": getattr(message, "topic", TOPIC),
+            "topic": getattr(message, "topic", SETTINGS.kafka_topic),
             "partition": getattr(message, "partition", None),
             "offset": getattr(message, "offset", None),
         },
@@ -57,7 +54,7 @@ def run_consumer(consumer: Iterable[Any] | None = None) -> None:
                 logger.exception(
                     "Skipping failed Kafka message",
                     extra={
-                        "topic": getattr(message, "topic", TOPIC),
+                        "topic": getattr(message, "topic", SETTINGS.kafka_topic),
                         "partition": getattr(message, "partition", None),
                         "offset": getattr(message, "offset", None),
                     },

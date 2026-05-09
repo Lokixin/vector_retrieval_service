@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 
-from vector_retrieval_service.presenters.routers.iamges import image_router
+from vector_retrieval_service.presenters.routers.images import image_router
 from vector_retrieval_service.presenters.routers.multimodals import (
     multimodal_router,
 )

@@ -7,11 +7,12 @@
 - Format with `make reformat`; it only runs `ruff format src tests`.
 - Run integration tests with `make integration` or `poetry run pytest ./tests/integration --disable-warnings`.
 - Focus a single test with `poetry run pytest tests/integration/test_text_services.py::test_get_text_embedding_service --disable-warnings`.
+- Start local Kafka/Zookeeper with `docker compose up -d`; the compose file intentionally exposes Kafka on `localhost:9093`.
 
 ## Architecture
 - Package source is under `src/vector_retrieval_service`; Poetry uses the `src` layout.
 - FastAPI app entrypoint is `vector_retrieval_service.presenters.fastapi_app:app`.
-- Routers live in `presenters/routers`; the image router filename is intentionally misspelled as `iamges.py` and is imported that way by `fastapi_app.py`.
+- Routers live in `presenters/routers`; image routes are in `images.py` and are imported by `fastapi_app.py`.
 - `services/` contains async use-case functions; `presenters/dependencies.py` constructs model interfaces for FastAPI dependency injection.
 - Model factories in `domain/factories.py` are cached with `lru_cache` and load Hugging Face/SentenceTransformer/CLIP models.
 - Kafka producer/consumer scripts use topic `text_services` and connect to `127.0.0.1:9093`; `docker-compose.yaml` provides Kafka and Zookeeper with the external listener on port `9093`.

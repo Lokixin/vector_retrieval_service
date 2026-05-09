@@ -40,14 +40,18 @@ class ImageModelInterface:
         )
 
     def _encode(
-        self, image: Image, padding: bool = False, text: str | list[str] | None = None
+        self,
+        image: Image | list[Image],
+        padding: bool = False,
+        text: str | list[str] | None = None,
     ) -> Any:
         processed_input = self.pre_processor(
             images=image, return_tensors="pt", padding=padding, text=text
         ).to(DEVICE)
-        if not text:
-            return self.model.get_image_features(**processed_input).to(DEVICE)
-        return self.model(**processed_input)
+        with torch.inference_mode():
+            if not text:
+                return self.model.get_image_features(**processed_input).to(DEVICE)
+            return self.model(**processed_input)
 
     async def encode(self, image: Image) -> torch.Tensor:
         return await asyncer.asyncify(self._encode)(image=image)

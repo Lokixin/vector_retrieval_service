@@ -1,4 +1,4 @@
-from kafka import KafkaProducer
+from kafka import KafkaProducer  # type: ignore[import-untyped]
 import json
 
 from vector_retrieval_service.domain.factories import LanguageModels
@@ -17,8 +17,9 @@ if __name__ == "__main__":
         requested_model=LanguageModels.MINI_LM,
     )
     future = producer.send(
-        TOPIC, event.model_dump(),
-        headers=[("event_type", "text".encode("utf-8"))]
+        TOPIC,
+        event.model_dump(by_alias=True),
+        headers=[("event_type", "text".encode("utf-8"))],
     )
     result = future.get()
     print(result)

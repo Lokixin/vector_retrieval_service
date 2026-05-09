@@ -58,21 +58,21 @@ def transform_image_embeddings_to_response(
 def transform_texts_to_image_similarity_to_response(
     logits_per_text: torch.Tensor, texts: list[str]
 ) -> TextsToImageSimilarities:
-    logits_per_text = logits_per_text.cpu().detach().tolist()
+    score_rows = logits_per_text.cpu().detach().tolist()
     score_by_text = [
         TextsToImageSimilarity(text=input_text, score=score[0])
-        for input_text, score in zip(texts, logits_per_text)
+        for input_text, score in zip(texts, score_rows)
     ]
     sorted_results = sorted(score_by_text, key=lambda item: item.score, reverse=True)
     return TextsToImageSimilarities(similarities=sorted_results)
 
 
 def transform_texts_to_images_similarities_to_response(
-    texts: list[str], image_ids: list[str], logits: torch.Tensor
+    texts: list[str], image_ids: list[str | None], logits: torch.Tensor
 ) -> list[TextToImagesSimilarity]:
     scores = []
-    logits = logits.cpu().detach().tolist()
-    for idx, text_to_images_scores in enumerate(logits):
+    score_rows = logits.cpu().detach().tolist()
+    for idx, text_to_images_scores in enumerate(score_rows):
         score_by_text = {
             image_id: score for image_id, score in zip(image_ids, text_to_images_scores)
         }

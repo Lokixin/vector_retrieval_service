@@ -18,9 +18,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: poetry
 
       - name: Install Poetry
         run: pipx install poetry
+
+      - name: Configure Poetry cache path
+        run: poetry config virtualenvs.in-project true
 
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
@@ -32,4 +36,4 @@ jobs:
         run: make lint
 
       - name: Test
-        run: poetry run pytest --disable-warnings
+        run: poetry run pytest --disable-warnings --cov=vector_retrieval_service --cov-report=term-missing

@@ -3,6 +3,7 @@ from typing import Any
 
 import pytest
 
+from vector_retrieval_service.config import AppSettings
 from vector_retrieval_service.consumers import consumer
 
 
@@ -65,11 +66,14 @@ def test_make_consumer_uses_configured_kafka_settings(
             calls.append((args, kwargs))
 
     monkeypatch.setattr(consumer, "KafkaConsumer", FakeKafkaConsumer)
-    monkeypatch.setattr(consumer, "TOPIC", "custom-topic")
-    monkeypatch.setattr(consumer, "BOOTSTRAP_SERVERS", ["localhost:9093"])
-    monkeypatch.setattr(consumer, "GROUP_ID", "custom-group")
+    settings = AppSettings(
+        device="cpu",
+        kafka_topic="custom-topic",
+        kafka_bootstrap_servers=["localhost:9093"],
+        kafka_group_id="custom-group",
+    )
 
-    consumer.make_consumer()
+    consumer.make_consumer(settings)
 
     args, kwargs = calls[0]
     assert args == ("custom-topic",)

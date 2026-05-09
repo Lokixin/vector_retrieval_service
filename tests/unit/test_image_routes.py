@@ -156,6 +156,20 @@ def test_multimodal_route_preserves_commas_inside_text(
     assert response.json() == {"similarities": [{"text": "cat,dog", "score": 0.5}]}
 
 
+def test_multimodal_route_rejects_blank_texts(client: TestClient) -> None:
+    app.dependency_overrides[get_image_model_interface] = lambda: None
+
+    response = client.post(
+        "/multimodal/texts_and_image_scores",
+        params={"requested_model": "clip_model"},
+        data={"texts": ["", "   "]},
+        files={"image": ("image.png", make_png(), "image/png")},
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "At least one non-empty text is required"}
+
+
 def test_multimodal_multi_image_route_accepts_repeated_text_form_fields(
     client: TestClient,
 ) -> None:

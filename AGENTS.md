@@ -6,7 +6,9 @@
 - Run lint/type checks with `make lint`; it runs `ruff check src tests` and `mypy src tests`.
 - Format with `make reformat`; it only runs `ruff format src tests`.
 - Run integration tests with `make integration` or `poetry run pytest ./tests/integration --disable-warnings`.
+- Run coverage locally with `poetry run pytest --disable-warnings --cov=vector_retrieval_service --cov-report=term-missing`.
 - Focus a single test with `poetry run pytest tests/integration/test_text_services.py::test_get_text_embedding_service --disable-warnings`.
+- Run optional Kafka Docker coverage with `RUN_KAFKA_DOCKER_TESTS=1 poetry run pytest tests/integration/test_kafka_docker.py --disable-warnings` after `docker compose up -d`.
 - Start local Kafka/Zookeeper with `docker compose up -d`; the compose file intentionally exposes Kafka on `localhost:9093`.
 
 ## Architecture
@@ -15,7 +17,7 @@
 - Routers live in `presenters/routers`; image routes are in `images.py` and are imported by `fastapi_app.py`.
 - `services/` contains async use-case functions; `presenters/dependencies.py` constructs model interfaces for FastAPI dependency injection.
 - Model factories in `domain/factories.py` are cached with `lru_cache` and load Hugging Face/SentenceTransformer/CLIP models.
-- Kafka producer/consumer scripts use topic `text_services` and connect to `127.0.0.1:9093`; `docker-compose.yaml` provides Kafka and Zookeeper with the external listener on port `9093`.
+- `config.AppSettings` centralizes `VECTOR_RETRIEVAL_DEVICE`, `KAFKA_TOPIC`, `KAFKA_BOOTSTRAP_SERVERS`, and `KAFKA_GROUP_ID`; producer/consumer scripts read from `config.SETTINGS`.
 - CI lives in `.github/workflows/ci.yaml` and runs `make lint` plus `poetry run pytest --disable-warnings` on Python 3.11.
 
 ## Test And Runtime Gotchas

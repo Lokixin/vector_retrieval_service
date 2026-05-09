@@ -3,14 +3,10 @@ from typing import Any
 import numpy as np
 import torch
 
-from vector_retrieval_service.domain.ai_models import (
-    LanguageModelInterface,
-    ScoreComputer,
-)
 from vector_retrieval_service.domain.factories import LanguageModels
 
 
-class FakeModelInterface(LanguageModelInterface):
+class FakeModelInterface:
     def __init__(self, language_model: LanguageModels, output: Any) -> None:
         self.language_model = language_model
         self.output = output
@@ -28,6 +24,6 @@ class FakeModelInterface(LanguageModelInterface):
             return torch.tensor(self.output)
 
 
-class FakeScoreComputer(ScoreComputer):
+class FakeScoreComputer:
     def compute_score(self, corpus: Any, query: Any) -> Any:
         return np.linalg.norm(query - corpus)

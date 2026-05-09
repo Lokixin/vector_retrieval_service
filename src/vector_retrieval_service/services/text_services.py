@@ -1,6 +1,6 @@
 from vector_retrieval_service.domain.ai_models import (
-    LanguageModelInterface,
-    ScoreComputer,
+    LanguageModelProtocol,
+    ScoreComputerProtocol,
 )
 
 from vector_retrieval_service.domain.factories import (
@@ -20,7 +20,7 @@ from vector_retrieval_service.services.dtos import (
 async def get_text_embedding_service(
     text: str,
     requested_model: LanguageModels,
-    llm_interface: LanguageModelInterface,
+    llm_interface: LanguageModelProtocol,
 ) -> TextEmbeddingsResponse:
     embeddings = await llm_interface.encode(model_input=[text])
     embedding_response = transform_embeddings_to_response(
@@ -33,8 +33,8 @@ async def get_text_similarity_service(
     query: str,
     texts: list[str],  # TODO: Rename it as corpus
     score_function: SearchScoreFunctions,
-    llm_interface: LanguageModelInterface,
-    score_computer: ScoreComputer,
+    llm_interface: LanguageModelProtocol,
+    score_computer: ScoreComputerProtocol,
 ) -> TextSimilarityResponse:
     is_tensor_required = score_function != SearchScoreFunctions.EUCLIDEAN
     embeddings = await llm_interface.encode(

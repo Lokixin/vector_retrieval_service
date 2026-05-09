@@ -27,7 +27,12 @@ class SearchScoreFunctions(StrEnum):
 
 @lru_cache
 def make_llm(model_type: LanguageModels | str) -> SentenceTransformer:
-    match model_type:
+    try:
+        language_model = LanguageModels(model_type)
+    except ValueError as exc:
+        raise ValueError(f"Unknown language model: {model_type}") from exc
+
+    match language_model:
         case LanguageModels.MINI_LM:
             mini_lm = SentenceTransformer(
                 "sentence-transformers/all-MiniLM-L6-v2", device=DEVICE
@@ -38,24 +43,22 @@ def make_llm(model_type: LanguageModels | str) -> SentenceTransformer:
                 "sentence-transformers/all-mpnet-base-v2", device=DEVICE
             )
             return mpnet_v2
-        case _:
-            mini_lm = SentenceTransformer(
-                "sentence-transformers/all-MiniLM-L6-v2", device=DEVICE
-            )
-            return mini_lm
 
 
 def make_score_function(
     score_function: SearchScoreFunctions | str,
 ) -> typing.Callable[..., typing.Any]:
-    match score_function:
+    try:
+        score_function_type = SearchScoreFunctions(score_function)
+    except ValueError as exc:
+        raise ValueError(f"Unknown score function: {score_function}") from exc
+
+    match score_function_type:
         case SearchScoreFunctions.EUCLIDEAN:
             return compute_euclidean_distance
         case SearchScoreFunctions.COSINE_SIMILARITY:
             return util.cos_sim
         case SearchScoreFunctions.DOT_PRODUCT:
-            return util.dot_score
-        case _:
             return util.dot_score
 
 
@@ -63,17 +66,13 @@ def make_score_function(
 def make_image_model(
     model_type: ImageModels | str,
 ) -> tuple[PreTrainedModel, PreTrainedModel]:
-    match model_type:
-        case ImageModels.CLIP_MODEL:
-            clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(
-                DEVICE
-            )
-            clip_model.eval()
-            clip_processor = CLIPProcessor.from_pretrained(
-                "openai/clip-vit-base-patch32"
-            )
-            return clip_processor, clip_model
-        case _:
+    try:
+        image_model = ImageModels(model_type)
+    except ValueError as exc:
+        raise ValueError(f"Unknown image model: {model_type}") from exc
+
+    match image_model:
+        case ImageModels.CLIP_MODEL | ImageModels.FAKE:
             clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(
                 DEVICE
             )

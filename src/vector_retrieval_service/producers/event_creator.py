@@ -10,9 +10,7 @@ def make_text_to_encode_event(
 ) -> TextToEncodeEvent:
     return TextToEncodeEvent(
         text_to_encode=text_to_encode,
-        requested_model=requested_model.value
-        if requested_model
-        else LanguageModels.MINI_LM.value,
+        requested_model=requested_model if requested_model else LanguageModels.MINI_LM,
         _id=uuid.uuid4().hex,
         requested_at=str(datetime.datetime.now(tz=datetime.timezone.utc)),
     )

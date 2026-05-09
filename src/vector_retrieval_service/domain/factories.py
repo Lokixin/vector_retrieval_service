@@ -2,9 +2,6 @@ import typing
 from enum import StrEnum, auto
 from functools import lru_cache
 
-from numpy import ndarray, dtype, floating
-from numpy._typing import _32Bit
-
 from sentence_transformers import SentenceTransformer, util  # type: ignore
 from transformers import PreTrainedModel, CLIPModel, CLIPProcessor  # type: ignore
 
@@ -33,30 +30,24 @@ def make_llm(model_type: LanguageModels | str) -> SentenceTransformer:
     match model_type:
         case LanguageModels.MINI_LM:
             mini_lm = SentenceTransformer(
-                "sentence-transformers/all-MiniLM-L6-v2", device="cuda:0"
+                "sentence-transformers/all-MiniLM-L6-v2", device=DEVICE
             )
             return mini_lm
         case LanguageModels.MPNET_BASE_V2:
             mpnet_v2 = SentenceTransformer(
-                "sentence-transformers/all-mpnet-base-v2", device="cuda:0"
+                "sentence-transformers/all-mpnet-base-v2", device=DEVICE
             )
             return mpnet_v2
         case _:
             mini_lm = SentenceTransformer(
-                "sentence-transformers/all-MiniLM-L6-v2", device="cuda:0"
+                "sentence-transformers/all-MiniLM-L6-v2", device=DEVICE
             )
             return mini_lm
 
 
 def make_score_function(
     score_function: SearchScoreFunctions | str,
-) -> typing.Callable[
-    [
-        ndarray[typing.Any, dtype[floating[_32Bit]]],
-        ndarray[typing.Any, dtype[floating[_32Bit]]],
-    ],
-    floating[typing.Any],
-]:
+) -> typing.Callable[..., typing.Any]:
     match score_function:
         case SearchScoreFunctions.EUCLIDEAN:
             return compute_euclidean_distance
@@ -77,6 +68,7 @@ def make_image_model(
             clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(
                 DEVICE
             )
+            clip_model.eval()
             clip_processor = CLIPProcessor.from_pretrained(
                 "openai/clip-vit-base-patch32"
             )
@@ -85,6 +77,7 @@ def make_image_model(
             clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(
                 DEVICE
             )
+            clip_model.eval()
             clip_processor = CLIPProcessor.from_pretrained(
                 "openai/clip-vit-base-patch32"
             )

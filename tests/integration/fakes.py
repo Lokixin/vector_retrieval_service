@@ -12,7 +12,7 @@ from vector_retrieval_service.domain.factories import LanguageModels
 
 class FakeModelInterface(LanguageModelInterface):
     def __init__(self, language_model: LanguageModels, output: Any) -> None:
-        super().__init__(language_model)
+        self.language_model = language_model
         self.output = output
 
     async def encode(
@@ -29,5 +29,5 @@ class FakeModelInterface(LanguageModelInterface):
 
 
 class FakeScoreComputer(ScoreComputer):
-    def compute_score(self, query: Any, corpus: Any) -> Any:
+    def compute_score(self, corpus: Any, query: Any) -> Any:
         return np.linalg.norm(query - corpus)

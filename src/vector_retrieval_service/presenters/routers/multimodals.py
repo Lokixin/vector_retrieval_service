@@ -1,11 +1,9 @@
-from io import BytesIO
-
-from PIL import Image
 from fastapi import APIRouter, UploadFile, Depends
 
 from vector_retrieval_service.domain.ai_models import ImageModelInterface
 from vector_retrieval_service.domain.factories import ImageModels
 from vector_retrieval_service.presenters.dependencies import get_image_model_interface
+from vector_retrieval_service.presenters.image_uploads import read_image_upload
 from vector_retrieval_service.services.dtos import (
     TextToImagesSimilarity,
     TextsToImageSimilarities,
@@ -27,8 +25,7 @@ async def get_text_and_image_similitude(
     requested_model: ImageModels,
     model_interface: ImageModelInterface = Depends(get_image_model_interface),
 ) -> TextsToImageSimilarities:
-    image_bytes = BytesIO(await image.read())
-    pillow_image = Image.open(image_bytes)
+    pillow_image = await read_image_upload(image)
     res = await get_text_and_image_similitude_service(
         image=pillow_image, texts=texts[0].split(","), model_interface=model_interface
     )
@@ -43,7 +40,7 @@ async def get_texts_and_images_similitude(
     model_interface: ImageModelInterface = Depends(get_image_model_interface),
 ) -> list[TextToImagesSimilarity]:
     image_names = [image.filename for image in images]
-    pillow_images = [Image.open(BytesIO(await image.read())) for image in images]
+    pillow_images = [await read_image_upload(image) for image in images]
     res = await get_texts_and_image_similitude_service(
         images=pillow_images,
         texts=texts[0].split(","),

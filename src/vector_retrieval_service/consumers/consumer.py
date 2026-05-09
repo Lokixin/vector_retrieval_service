@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from kafka import KafkaConsumer
+from kafka import KafkaConsumer  # type: ignore[import-untyped]
 import json
 
 from vector_retrieval_service.consumers.event_processor import process_event
